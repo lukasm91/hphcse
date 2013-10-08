@@ -31,8 +31,8 @@ private:
 	std::uniform_real_distribution<double> uniform(lb, ub);
 	std::normal_distribution<double> normal(meanv, sigma);
 
-	std::vector<Particle> particle; // particles
-	void calc_acc();				// calculate accelerations
+	std::vector<Particle> particles; 	// particles
+	void calc_acc();					// calculate accelerations
 	void calc_pos(double);		// calculate new positions
 	void calc_vel(double);		// calculate new velocities
 public:
