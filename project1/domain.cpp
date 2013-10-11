@@ -4,7 +4,7 @@
 // Constructor
 Domain::Domain(int n) : n_pt(n) {
 	// create arrays for particles and random numbers
-	*particles = new Particle[n];
+	*prt = new Particle[n];
 	nn = 3*n;	// we need 3 random numbers per particle and initial condition
 	int m = (nn%2 == 0) ? nn/2 : (nn+1)/2;
 	double *uniform = new double[nn];
@@ -21,11 +21,11 @@ Domain::Domain(int n) : n_pt(n) {
 		normal[2*i] = sqrt(-2*log(r1))*cos(2*pi*r2);
 		normal[2*i+1] = sqrt(-2*log(r1))*sin(2*pi*r2);
 	}
-	// add particles
+	// add prt
 	for (int i=0; i<n; ++i) {
 		for (int j=0; j<3; ++j) {
-			particles[i].p1[j] = uniform[3*i+j];
-			particles[i].v1[j] = normal[3*i+j];
+			prt[i].x1[j] = uniform[3*i+j];
+			prt[i].v1[j] = normal[3*i+j];
 		}
 	}
 	// calc acceleration
@@ -37,13 +37,13 @@ Domain::Domain(int n) : n_pt(n) {
 
 // Destructor 
 Domain::~Domain() {
-	delete[] particles;
+	delete[] prt;
 }
 
 double get_distance(Particle PA, Particle PB) {
-	double r = abs(sqrt( (PA.p1[0]-PB.p1[0])^2
-						+(PA.p1[1]-PB.p1[1])^2
-						+(PA.p1[2]-PB.p1[2])^2 ));
+	double r = abs(sqrt( (PA.x1[0]-PB.x1[0])^2
+						+(PA.x1[1]-PB.x1[1])^2
+						+(PA.x1[2]-PB.x1[2])^2 ));
 	return r;
 
 }
@@ -52,33 +52,41 @@ void Domain::calc_acc() {
 	double r_vec[3];	// distance vector between 2 particles
 	double f_vec[3];	// force vector between 2 particles
 	double r;			// abs distance between 2 particles
-	for (unsigned i=0; i < n_pt; ++i) {
-		for (unsigned j=0; j < n_pt; ++j) {
-			if (i != j) {
+	for (unsigned i=0; i<n_pt; ++i) {
+		for (unsigned j=0; j<n_pt; ++j) {
+			if (i!=j) {
 				// calculate force and acceleration on particle
-				r_vec[0] = particles[i].p1[0] - particles[j].p1[0];
-				r_vec[1] = particles[i].p1[1] - particles[j].p1[1];
-				r_vec[2] = particles[i].p1[2] - particles[j].p1[2];
-				r = get_distance(particles[i], particles[j]);
-				for (unsigned k=0; k < 3; ++k) {
+				r_vec[0] = prt[i].x1[0] - prt[j].x1[0];
+				r_vec[1] = prt[i].x1[1] - prt[j].x1[1];
+				r_vec[2] = prt[i].x1[2] - prt[j].x1[2];
+				r = get_distance(prt[i], prt[j]);
+				for (unsigned k=0; k<3; ++k) {
 					f_vec[k] =  f_vec[k]
 							-24*eps*(2*(s_lj/r)^12 - (s_lj/r)^6)*r_vec[k]/r^2;
 				}
 			}
 		}
 		for (unsigned k=0; k<3; ++k)
-			particles[i].a2[k] += f_vec[k];
+			prt[i].a2[k] += f_vec[k];
 	}
 }
 
 void Domain::calc_pos(double t) {
-// TODO
+	for (unsigned i=0; i<n_pt; ++i) {
+		for (unsigned k=0; k<3; ++k)
+			prt[i].x2[k] = prt[i].x1[k] + t*prt[i].v1[k] + t^2*prt[i].a1[k];
+	}
 }
 
+
 void Domain::calc_vel(double t) {
-// TODO
+	for (unsigned i=0; i<n_pt; ++i) {
+		for (unsigned k=0; k<3; ++k)
+			prt[i].v2[k] = prt[i].v1[k] + t/2*(prt[i].a1[k]+prt[i].a2[k]);
+	}
 }
 
 void Domain::next_timestep(double t) {
+// we've got x1, v1 and a1
 // TODO
 }
