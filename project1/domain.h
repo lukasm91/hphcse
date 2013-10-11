@@ -19,14 +19,14 @@ srand48( static_cast<unsigned>(std::time(NULL)) );
 struct Particle{
 	const double mass = 1;
 	// position vectors
-	double p1[3], p2[3];	// position arrays
+	double x1[3], x2[3];	// position arrays
 	double v1[3], v2[3];	// velocity arrays
 	double a1[3], a2[3];	// acceleration arrays
 };
 
 class Domain{
 private:
-	Particles *particles; 			// particles
+	Particles *prt;		 			// particles
 	int n_pt;						// number of particles
 	double r_vec[3];				// distance vector between 2 particles
 	double f_vec[3];				// force vector between 2 particles
