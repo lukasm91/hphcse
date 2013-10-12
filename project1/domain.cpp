@@ -49,7 +49,7 @@ Domain::~Domain() {
 }
 
 // get distance between two particles
-double Domain::get_distance(Particle PA, Particle PB) {
+inline double Domain::get_distance(Particle PA, Particle PB) {
 	double r = abs(sqrt( (PA.x2[0]-PB.x2[0])^2
 						+(PA.x2[1]-PB.x2[1])^2
 						+(PA.x2[2]-PB.x2[2])^2 ));
@@ -134,6 +134,7 @@ void Domain::next_timestep(double t) {
 	calc_vel(t);
 }
 
+// calculate kinetic energy
 double Domain::calc_Ekin() {
 	double eKin = 0;
 	double v;
@@ -144,10 +145,59 @@ double Domain::calc_Ekin() {
 	return eKin;
 }
 
+// calculate potential energy
 double Domain::calc_Epot() {
 	//TODO
 }
 
+// calculate total energy
+double Domain::calc_Etot() {
+	//TODO
+}
 
+// calculate center of mass
+double* Domain::calc_ctr_m() {
+	double ctr_m[3];
+	double m = 0;
+	// first set all values to 0
+	for (unsigned k=0; k<3; ++k)
+		ctr_m[k] = 0;
+	// calculate...
+	for (unsigned i=0; i<n_pt; ++i) {
+		m += prt[i].mass;
+		for (unsigned k=0; k<3; ++k)
+			ctr_m[k] += prt[i].mass*prt[i].x2[k];
+	}
+	for (unsigned k=0; k<3; ++k)
+		ctr_m[k] = ctr_m[k]/m;
+	return *ctr_m;
+}
 
+// calculate total angular momentum
+double* Domain::calc_tot_am() {
+	double tot_am[3];
+	// set all values to 0
+	for (unsigned k=0; k<3; ++k)
+		tot_am[k] = 0;
+	// calculate...
+	for (unsigned i=0; i<n_pt; ++i) {
+		tot_am[0] += (prt[i].x2[1]*prt[i].v2[2]-prt[i].x2[2]*prt[i].v2[1])*prt[i].mass;
+		tot_am[1] += (prt[i].x2[2]*prt[i].v2[0]-prt[i].x2[0]*prt[i].v2[2])*prt[i].mass;
+		tot_am[2] += (prt[i].x2[0]*prt[i].v2[1]-prt[i].x2[1]*prt[i].v2[0])*prt[i].mass;
+	}
+	return *tot_am;
+}
 
+// calculate total linear momentum
+double* Domain::calc_tot_lm() {
+	double tot_lm[3];
+	// set all values to 0
+	for (unsigned k=0; k<3; ++k)
+		tot_lm[k] = 0;
+	//calculate...
+	for (unsigned i=0; i<n_pt; ++i) {
+		for (unsigned k=0; k<3; ++k)
+			tot_lm[k] += prt[i].mass*prt[i].v2[k];
+	}
+	return *tot_lm;
+}

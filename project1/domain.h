@@ -27,7 +27,11 @@ public:
 	~Domain();						// Destructor
 	void next_timestep(double t);	// go one timestep further
 	double calc_Ekin();				// calculate kinetic energy
-	double calc_Epot();				// calcluate potential energy
+	double calc_Epot();				// calculate potential energy
+	double calc_Etot();				// calculate total energy
+	double* calc_ctr_m();			// calculate center of mass
+	double* calc_tot_am();			// calculate total angular momentum
+	double* calc_tot_lm();			// calculate total linear momentum
 };
 
 #endif
