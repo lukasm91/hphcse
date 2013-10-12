@@ -6,6 +6,8 @@ nBody: main.o domain.o
 $(CC) $(LFLAGS) -o $@ $^
 main.o: main.cpp domain.h
 $(CC) $(CFLAGS) $<
-domain.o: domain.cpp domain.h
+domain.o: domain.cpp domain.h particle.h
+$(CC) $(CFLAGS) $<
+particle.o: particle.cpp particle.h
 $(CC) $(CFLAGS) $<
 
