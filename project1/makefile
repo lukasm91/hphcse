@@ -2,7 +2,7 @@
 CC = g++
 CFLAGS = -Wall -pedantic -ansi -c
 LFLAGS = -Wall
-nBody: main.o domain.o
+nBody: main.o domain.o particle.o
 $(CC) $(LFLAGS) -o $@ $^
 main.o: main.cpp domain.h
 $(CC) $(CFLAGS) $<
