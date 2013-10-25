@@ -13,16 +13,16 @@ private:
 	const double sigma;				// sigma (Lennard-Jones)
 	const int lb;					// lower boundary
 	const int ub;					// upper boundary
-	Particle *prt;		 			// particles
-	double **dist;					// distance matrix
 	double get_distance(Particle, Particle);	// get abs distance
 	void update_dist();				// get abs distance
 	void calc_acc();				// calculate acceleration
 	void calc_pos(double t);		// calculate new positions
 	void calc_vel(double t);		// calculate new velocities
 public:
+	double **dist;					// distance matrix
 	Domain(unsigned n_pt, double eps, double sigma, int lb, int ub);	// Constructor
 	~Domain();						// Destructor
+	Particle *prt;					// particles
 	double ctr_m[3];				// center of mass
 	double tot_am[3];				// total angular momentum
 	double tot_lm[3];				// total linear momentum

@@ -24,10 +24,14 @@ Domain::Domain(unsigned n, double e, double s, int l, int u) :
 	double r1;
 	double r2;
 	for (unsigned i=0; i<m; ++i) {
-		r1 = ((drand48()-0.5)+(ub+lb)/2)*abs(ub-lb);
-		r2 = ((drand48()-0.5)+(ub+lb)/2)*abs(ub-lb);
-		normal[2*i] = sqrt(-2*log(r1))*cos(2*pi*r2);
-		normal[2*i+1] = sqrt(-2*log(r1))*sin(2*pi*r2);
+//		r1 = ((drand48()-0.5)+(ub+lb)/2)*abs(ub-lb);
+//		r2 = ((drand48()-0.5)+(ub+lb)/2)*abs(ub-lb);
+//		normal[2*i] = sqrt(-2*log(r1))*cos(2*pi*r2);
+//		normal[2*i+1] = sqrt(-2*log(r1))*sin(2*pi*r2);
+		r1 = drand48();
+		r2 = drand48();
+		normal[2*i] = ((sqrt(-2*log(r1))*cos(2*pi*r2)-0.5)+(ub+lb)/2)*abs(ub-lb);
+		normal[2*i+1] = ((sqrt(-2*log(r1))*sin(2*pi*r2)-0.5)+(ub+lb)/2)*abs(ub-lb);
 	}
 	// add prt
 	for (unsigned i=0; i<n; ++i) {
