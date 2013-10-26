@@ -26,8 +26,8 @@ void prtout(std::ofstream &out, Domain &d, unsigned i, unsigned n) {
 int main(int argc, char *argv[])
 {	
 	ArgumentParser parser(argc, argv);
-	const unsigned t = parser("-steps").asInt(10);		// number of steps, default 10
-	const unsigned n = parser("-particles").asInt(10);	// number of particles, default 10
+	const unsigned t = parser("-t").asInt(10);		// number of steps, default 10
+	const unsigned n = parser("-n").asInt(10);		// number of particles, default 10
 
 	// constants
 	const double m = 1;				// mass of a particle
@@ -39,9 +39,9 @@ int main(int argc, char *argv[])
 
 	// files for output
 	std::ofstream outfile("nbody.out", std::ios::out);
-	std::ofstream prtrack("prttrack.out", std::ios::out);
+// 	std::ofstream prtrack("prttrack.out", std::ios::out);
 	outfile.precision(4);
-	prtrack.precision(4);
+// 	prtrack.precision(4);
 
 	// create domain
 	Domain d = Domain(n, m, dt, epsilon, sigma, lb, ub);
@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
 
 	// timesteps
 	for (unsigned i=0; i<t; ++i) {
-		prtout(prtrack, d, i, n);
+// 		prtout(prtrack, d, i, n);
 		outfile << std::fixed
 				<< i << "\t" << d.eKin << "\t" << d.ePot << "\t" << d.eTot
 				<< "\t" << d.ctr_m[0] << "\t" << d.ctr_m[1] << "\t" << d.ctr_m[2]
@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
 				<< "\t" << d.tot_am[0] << "\t" << d.tot_am[1] << "\t" << d.tot_am[2] << std::endl;
 		d.next_timestep();
 	}
-	prtout(prtrack, d, t, n);
+// 	prtout(prtrack, d, t, n);
 	outfile << std::fixed
 			<< t << "\t" << d.eKin << "\t" << d.ePot << "\t" << d.eTot
 			<< "\t" << d.ctr_m[0] << "\t" << d.ctr_m[1] << "\t" << d.ctr_m[2]
