@@ -3,36 +3,47 @@
 #define _DOMAIN_H
 
 #include <ctime>
-#include "particle.h"
+#include <cmath>
+#include <cstdlib>
+//#include "particle.h"
 
 class Domain{
 private:
-	const double pi;				// the number pi
-	const unsigned n_pt;			// number of particles
-	const double eps;				// epsilon (Lennard-Jones)
-	const double sigma;				// sigma (Lennard-Jones)
-	const int lb;					// lower boundary
-	const int ub;					// upper boundary
-	double get_distance(Particle, Particle);	// get abs distance
-	void update_dist();				// get abs distance
+	const double pi_;				// the number pi
+	const unsigned n_;				// number of particles
+	const double m_;				// mass of particle
+	const double t_;				// timestep size
+	const double e_;				// epsilon (Lennard-Jones)
+	const double s_;				// sigma (Lennard-Jones)
+	const double lb_;				// lower boundary
+	const double ub_;				// upper boundary
+	const double rc_;				// cut off radius
+	const double U_ljc_;			// Lennard-Jones potential at cut off radius
+	double eTotT;					// target total energy (has to remain constant)
+	double get_rf();				// get rescaling factor for velocities
 	void calc_acc();				// calculate acceleration
-	void calc_pos(double t);		// calculate new positions
-	void calc_vel(double t);		// calculate new velocities
-public:
-	double **dist;					// distance matrix
-	Domain(unsigned n_pt, double eps, double sigma, int lb, int ub);	// Constructor
-	~Domain();						// Destructor
-	Particle *prt;					// particles
-	double ctr_m[3];				// center of mass
-	double tot_am[3];				// total angular momentum
-	double tot_lm[3];				// total linear momentum
-	void next_timestep(double t);	// go one timestep further
-	double calc_Ekin();				// calculate kinetic energy
-	double calc_Epot();				// calculate potential energy
-	double calc_Etot();				// calculate total energy
+	void calc_pos();				// calculate new positions
+	void calc_vel();				// calculate new velocities
+	void resc_vel();				// rescale velocities
+	double get_Ekin();				// calculate kinetic energy
+	double get_Epot();				// calculate potential energy
+	double get_Etot();				// calculate total energy
 	void calc_ctr_m();				// calculate center of mass
 	void calc_tot_am();				// calculate total angular momentum
 	void calc_tot_lm();				// calculate total linear momentum
+public:
+	Domain(unsigned n, double m, double t, double e, double s, double lb, double ub);	// constructor
+	~Domain();						// destructor
+	double eTot;					// total energy
+	double ePot;					// potential energy
+	double eKin;					// kinetic energy
+	double *prt_x;					// positions of particles (x1, y1, z1, x2, y2, z2)
+	double *prt_v;					// velocities of particles (u1, v1, w1, u2, v2, w2)
+	double *prt_a;					// accelerations of particles (a1, b1, c1, a2, b2, c2)
+	double ctr_m[3];				// center of mass
+	double tot_am[3];				// total angular momentum
+	double tot_lm[3];				// total linear momentum
+	void next_timestep();			// go one timestep further
 };
 
 #endif

@@ -5,44 +5,69 @@
 #include <iostream>
 #include <fstream>
 #include "domain.h"
+#include "ArgumentParser.h"
 
-int main()
+void prtout(std::ofstream &out, Domain &d, unsigned i, unsigned n) {
+	out << "Timestep " << i << std::endl;
+	out << "-----------------------------------------------------" << std::endl;
+	for (unsigned j=0; j<n; ++j) {
+		out << "Particle " << j << ":" << std::endl;
+		out << "\t" << "x:" << "\t" << d.prt_x[3*(2*j+1)] << "\t" << d.prt_x[3*(2*j+1)+1]
+				<< "\t" << d.prt_x[3*(2*j+1)+2] << std::endl;
+		out << "\t" << "v:" << "\t" << d.prt_v[3*(2*j+1)] << "\t" << d.prt_v[3*(2*j+1)+1]
+				<< "\t" << d.prt_v[3*(2*j+1)+2] << std::endl;
+		out << "\t" << "a:" << "\t" << d.prt_a[3*(2*j+1)] << "\t" << d.prt_a[3*(2*j+1)+1]
+				<< "\t" << d.prt_a[3*(2*j+1)+2] << std::endl;
+	}
+	out << std::endl;
+}
+
+
+int main(int argc, char *argv[])
 {	
+	ArgumentParser parser(argc, argv);
+	const unsigned t = parser("-steps").asInt(10);		// number of steps, default 10
+	const unsigned n = parser("-particles").asInt(10);	// number of particles, default 10
+
 	// constants
-	const unsigned n = 10;			// number of particles
+	const double m = 1;				// mass of a particle
 	const double epsilon = 1;		// epsilon (Lennard-Jones)
-	const double sigma = 1;			// sigma (Lennard-Jones)
-	const int lb = -1;				// lower boundary
-	const int ub = 1;				// upper boundary
-	const unsigned t = 100;			// number of timesteps
-	const double dt = 1;			// timestep size
+	const double sigma = 0.1;		// sigma (Lennard-Jones)
+	const double lb = -1;			// lower boundary
+	const double ub = 1;			// upper boundary
+	const double dt = 0.0001;		// timestep size
+
 	// files for output
-	std::ofstream distance("distance.out", std::ios::out);
 	std::ofstream outfile("nbody.out", std::ios::out);
 	std::ofstream prtrack("prttrack.out", std::ios::out);
-	prtrack << "i" << "\t" << "r_x" << "\t" << "r_y" << "\t" << "r_z"
-			<< "\t" << "v_x" << "v_y" << "v_z" << std::endl;
-	outfile << "i" << "\t" << "E_Kin" << std::endl;
-	distance << "i" << "\t" << "r_x" << "\t" << "r_y" << "\t" << "r_z"
-			<< "\t" << "v_x" << "v_y" << "v_z" << std::endl;
+	outfile.precision(4);
+	prtrack.precision(4);
+
 	// create domain
-	Domain d = Domain(n, epsilon, sigma, lb, ub);
-	// inster distances
-	for (unsigned i=0; i<n; ++i) {
-		for (unsigned j=0; j<n; ++j) {
-			distance << d.dist[i][j] << "\t";
-		}
-		distance << std::endl;
-	}
+	Domain d = Domain(n, m, dt, epsilon, sigma, lb, ub);
+	outfile << std::fixed
+			<< "i" << "\t" << "E_Kin" << "\t" << "E_Pot" << "\t" << "E_Tot"
+			<< "\t" << "C_x" << "\t\t" << "C_y" << "\t\t" << "C_z"
+			<< "\t\t" << "P_x" << "\t\t" << "P_y" << "\t\t" << "P_z"
+			<< "\t\t" << "L_x" << "\t\t" << "L_y" << "\t\t" << "L_z" << std::endl;
+	outfile << std::endl;
 
 	// timesteps
 	for (unsigned i=0; i<t; ++i) {
-		outfile << i << "\t" << d.calc_Ekin() << std::endl;
-		prtrack << i << "\t" << d.prt[0].x2[0] << "\t" << d.prt[0].x2[1] << "\t"
-				<< d.prt[0].x2[2] << "\t" << d.prt[0].v2[0] << "\t"
-				<< d.prt[0].v2[1] << "\t" << d.prt[0].v2[2] << std::endl;
-		d.next_timestep(dt);
+		prtout(prtrack, d, i, n);
+		outfile << std::fixed
+				<< i << "\t" << d.eKin << "\t" << d.ePot << "\t" << d.eTot
+				<< "\t" << d.ctr_m[0] << "\t" << d.ctr_m[1] << "\t" << d.ctr_m[2]
+				<< "\t" << d.tot_lm[0] << "\t" << d.tot_lm[1] << "\t" << d.tot_lm[2] 
+				<< "\t" << d.tot_am[0] << "\t" << d.tot_am[1] << "\t" << d.tot_am[2] << std::endl;
+		d.next_timestep();
 	}
-	outfile << t << "\t" << d.calc_Ekin() << std::endl;
+	prtout(prtrack, d, t, n);
+	outfile << std::fixed
+			<< t << "\t" << d.eKin << "\t" << d.ePot << "\t" << d.eTot
+			<< "\t" << d.ctr_m[0] << "\t" << d.ctr_m[1] << "\t" << d.ctr_m[2]
+			<< "\t" << d.tot_lm[0] << "\t" << d.tot_lm[1] << "\t" << d.tot_lm[2] 
+			<< "\t" << d.tot_am[0] << "\t" << d.tot_am[1] << "\t" << d.tot_am[2] << std::endl;
 	return 0;
 }
+

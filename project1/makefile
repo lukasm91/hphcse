@@ -2,12 +2,11 @@
 CC = g++
 CFLAGS = -Wall -pedantic -ansi -c
 LFLAGS = -Wall
-nBody: main.o domain.o particle.o
+nBody: main.o domain.o
 	$(CC) $(LFLAGS) -o $@ $^
-main.o: main.cpp domain.h
+main.o: main.cpp domain.h ArgumentParser.h
 	$(CC) $(CFLAGS) $<
-domain.o: domain.cpp domain.h particle.h
+domain.o: domain.cpp domain.h
 	$(CC) $(CFLAGS) $<
-particle.o: particle.cpp particle.h
-	$(CC) $(CFLAGS) $<
-
+clean: 
+	$(RM) nBody *.o *.out
