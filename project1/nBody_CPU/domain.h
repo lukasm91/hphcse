@@ -11,6 +11,7 @@ class Domain{
 private:
 	const double pi_;				// the number pi
 	const unsigned n_;				// number of particles
+	const unsigned l_;				// number of particles per line
 	const double m_;				// mass of particle
 	const double t_;				// timestep size
 	const double e_;				// epsilon (Lennard-Jones)
@@ -31,6 +32,7 @@ private:
 	void calc_ctr_m();				// calculate center of mass
 	void calc_tot_am();				// calculate total angular momentum
 	void calc_tot_lm();				// calculate total linear momentum
+	void initial_grid();			// set up particles on grid
 public:
 	Domain(unsigned n, double m, double t, double e, double s, double lb, double ub);	// constructor
 	~Domain();						// destructor

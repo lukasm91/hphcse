@@ -4,7 +4,7 @@
 
 // Constructor
 Domain::Domain(unsigned n, double m, double t, double e, double s, double lb, double ub) :
-	pi_(3.14159265359), n_(n), m_(m), t_(t), e_(e), s_(s), lb_(lb), ub_(ub), rc_(2.5*s),
+	pi_(3.14159265359), n_(pow(n,3)), l_(n), m_(m), t_(t), e_(e), s_(s), lb_(lb), ub_(ub), rc_(2.5*s),
 	U_ljc_(4*e*(pow(0.4, 12)-pow(0.4, 6)))
 {
 	// reinitialization for drand48()
@@ -14,13 +14,21 @@ Domain::Domain(unsigned n, double m, double t, double e, double s, double lb, do
 	prt_v = new double[n_*6]();
 	prt_a = new double[n_*6]();
 	// random numbers
-	unsigned nn = 3*n_;	// we need 3 random numbers per particle and initial condition
+	unsigned nn = 3*n_;	// we need 3 random numbers per particle
 	unsigned mm = (nn%2 == 0) ? nn/2 : (nn+1)/2;
-	double *uniform = new double[nn];
 	double *normal = new double[2*mm];
-	// add uniformely distributed numbers to array
-	for (unsigned i=0; i<nn; ++i)
-		uniform[i] = ((drand48()-0.5)+(ub_+lb_)/2)*fabs(ub_-lb_);
+	// place particles on a grid
+// 	unsigned l = unsigned(pow(n_,(double)1/3)+0.5);	// particles per line
+	double d = fabs(ub_-lb_)/l_;		// distance between particles
+	for (unsigned i=0; i<l_; ++i) {
+		for (unsigned j=0; j<l_; ++j) {
+			for (unsigned k=0; k<l_; ++k) {
+				prt_x[3*(2*(i*l_*l_+j*l_+k)+1)] = lb_ + d/2 + i*d;		// x2
+				prt_x[3*(2*(i*l_*l_+j*l_+k)+1)+1] = lb_ + d/2 + j*d;	// y2
+				prt_x[3*(2*(i*l_*l_+j*l_+k)+1)+2] = lb_ + d/2 + k*d; 	// z2
+			}
+		}
+	}
 	// add normal distributed (Box-Muller) numbers to array
 	double r1;
 	double r2;
@@ -30,10 +38,9 @@ Domain::Domain(unsigned n, double m, double t, double e, double s, double lb, do
 		normal[2*i] = sqrt(-2*log(r1))*cos(2*pi_*r2);
 		normal[2*i+1] = sqrt(-2*log(r1))*sin(2*pi_*r2);
 	}
-	// set initial position and velocities of particles
+	// set initial velocities of particles
 	for (unsigned i=0; i<n_; ++i) {
 		for (unsigned j=0; j<3; ++j) {
-			prt_x[3*(2*i+1)+j] = uniform[3*i+j];	// x2, y2, z2
 			prt_v[3*(2*i+1)+j] = normal[3*i+j];	// u2, v2, w2
 		}
 	}
@@ -50,7 +57,6 @@ Domain::Domain(unsigned n, double m, double t, double e, double s, double lb, do
 	calc_tot_am();
 	calc_tot_lm();
 	// clean up
-	delete[] uniform;
 	delete[] normal;
 }
 

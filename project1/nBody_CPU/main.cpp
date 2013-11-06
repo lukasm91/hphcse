@@ -41,6 +41,7 @@ void nBody(unsigned t, unsigned n, bool print)
 	const double lb = -1;			// lower boundary
 	const double ub = 1;			// upper boundary
 	const double dt = 0.0001;		// timestep size
+	unsigned n3 = pow(n,3);			// #particle = n^3
 
 	// create domain
 	Domain d = Domain(n, m, dt, epsilon, sigma, lb, ub);
@@ -52,7 +53,7 @@ void nBody(unsigned t, unsigned n, bool print)
 	prtrack.precision(4);
 	
 	if (print) {
-		prtout(prtrack, d, 0, n, 1);
+		prtout(prtrack, d, 0, n3, 1);
 		outfile << std::fixed
 				<< "i" << "\t" << "E_Kin" << "\t" << "E_Pot" << "\t" << "E_Tot"
 				<< "\t" << "C_x" << "\t\t" << "C_y" << "\t\t" << "C_z"
@@ -64,7 +65,7 @@ void nBody(unsigned t, unsigned n, bool print)
 	// timesteps
 	for (unsigned i=0; i<t; ++i) {
 		if (print) {
-			prtout(prtrack, d, i, n, 0);
+			prtout(prtrack, d, i, n3, 0);
 			outfile << std::fixed
 					<< i << "\t" << d.eKin << "\t" << d.ePot << "\t" << d.eTot
 					<< "\t" << d.ctr_m[0] << "\t" << d.ctr_m[1] << "\t" << d.ctr_m[2]
@@ -74,7 +75,7 @@ void nBody(unsigned t, unsigned n, bool print)
 		d.next_timestep();
 	}
 	if (print) {
-	prtout(prtrack, d, t, n, 0);
+	prtout(prtrack, d, t, n3, 0);
 		outfile << std::fixed
 				<< t << "\t" << d.eKin << "\t" << d.ePot << "\t" << d.eTot
 				<< "\t" << d.ctr_m[0] << "\t" << d.ctr_m[1] << "\t" << d.ctr_m[2]
@@ -93,21 +94,21 @@ int main (int argc, char *argv[])
 	ArgumentParser parser(argc, argv);
 	const unsigned it = parser("-i").asInt(1);			// number of iterations, default 1
 	const unsigned t = parser("-t").asInt(100);			// number of timesteps
-	unsigned n = parser("-n").asInt(2);					// initial number of particles, default 2
+	unsigned n = parser("-n").asInt(2);					// initial number of particles per line, default 2
 	const bool print = parser("-p").asBool(1);			// print outfile?
 	
 	// timing
 	std::ofstream times("timing.out", std::ios::out);
-	times << "i" << "\t" << "n" << "\t" << "time" << std::endl;
+	times << "i" << "\t" << "n" << "\t" << "n^3" << "\t" << "time" << std::endl;
 	times << "-------------------------------------------" << std::endl;
 	Timer timer; // declaration of the timer
 
 	for (unsigned i=0; i<it; ++i) {
-		times << i << "\t" << n << "\t";
+		times << i << "\t" << n << "\t" << pow(n,3) << "\t";
 		timer.start();
 		nBody(t, n, print);
 		times << timer.stop() << std::endl;
-		n *= 2;
+		n++;
 	}
 		
 	return 0;
